@@ -2,9 +2,11 @@ const std = @import("std");
 const testing = std.testing;
 const ArrayList = std.ArrayList;
 const Allocator = std.mem.Allocator;
-const hasFn = std.meta.trait.hasFn;
+const hasFn = std.meta.hasFn;
 
-const implementsRLP = hasFn("encodeToRLP");
+inline fn implementsRLP(comptime T: type) bool {
+    return hasFn(T, "encodeToRLP");
+}
 
 pub const deserialize = @import("deserialize.zig").deserialize;
 
@@ -75,7 +77,7 @@ pub fn serialize(comptime T: type, allocator: Allocator, data: T, list: *ArrayLi
                 } else {
                     const index = list.items.len;
                     try list.append(0);
-                    var length = tlist.items.len;
+                    const length = tlist.items.len;
 
                     const length_length = try writeLengthLength(length, list);
                     list.items[index] = 247 + length_length;
